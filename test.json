@@ -1,0 +1,10 @@
+{
+  "area_name" : "Le nom styléééé de la zowne",
+  "sectors": {
+    "0-0": [1, 5, 9, 78, 23, 145454, 15, 45545, 454, 554]
+  },
+  "enemies": [
+    ["type", "pos"," ..."]
+
+  ]
+}
