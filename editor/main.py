@@ -3,6 +3,8 @@
 #          Thomas D.
 
 # IMPORTS
+import json
+
 import pygame
 import time
 import tkinter
@@ -77,10 +79,28 @@ class Editor:  # main class for the editor
         _map_file = open(f'{self.workspace_path}/map.json', 'a')  # the 'a' open argument create the file if he doesn't exist
         _map_file.close()  # closing it after the existance check is done
         self.log_success(f'\033[0;37m"{self.workspace_path}/map.json"\033[0m loaded successfully')
+
+        self.log('Project setup')
+        flag = False  # falg used to know if any setup was done inside the project
+        with open(f'{self.workspace_path}/map.json', 'w+') as _map_file:  # opening map.json
+            if not _map_file.readlines():  # if the file is empty
+                _BASIC_STRUCTURE = {
+                    'name': 'NEW MAP',
+                    'areas': []
+                }
+                self.log_warning('map.json is empty, creating basic structure')
+                # writing the default data into map.json
+                _map_file.seek(0)
+                json.dump(_BASIC_STRUCTURE, _map_file, indent=4)
+                _map_file.truncate()
+                flag = True
+        if flag: self.log_success('Project setup done')
+        else: self.log('No setup needed')
+
         while self.running:  # mainloop
             for event in pygame.event.get():  # basic pygame event handling
-                if event.type == pygame.QUIT:
-                    self.running = False
+                if event.type == pygame.QUIT:  # if the red cross is pressed
+                    self.running = False  # stopping the mainloop
 
             self.update()  # calling Editor.update method each frame
             self.render()  # calling Editor.render method each frame
