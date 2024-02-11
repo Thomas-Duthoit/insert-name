@@ -38,9 +38,12 @@ class Editor:  # main class for the editor
     def log_success(self, msg):  # log a success message in green
         self.log(f'\033[1;32mSUCCESS: {msg}\033[0m')
 
+    def log_warning(self, msg):  # log a warning message in yellow
+        self.log(f'\033[1;33mWARNING: {msg}\033[0m')  # loging with a yellow message
+
     def warning_check_equal(self, variable, equal_to, msg) -> bool:  # log a warning message if 'variable' == 'equal_to'
         #                                                              return true if 'variable'=='equal_to' else false
-        if variable == equal_to: self.log(f'\033[1;33mWARNING: {msg}\033[0m')  # loging with a yellow message
+        if variable == equal_to: self.log_warning(msg)
         return variable == equal_to
 
     def fatal_error(self, msg, exit_code=1):  # log an error message and exit with the specified exit code
@@ -69,6 +72,11 @@ class Editor:  # main class for the editor
             self.fatal_error('Workspace path is empty, exiting with code -2', -2)
         else:
             self.log_success('Workspace path is valid, loading data from directory')
+        self.log('Loading project')
+        # creating the json files if they don't exist
+        _map_file = open(f'{self.workspace_path}/map.json', 'a')  # the 'a' open argument create the file if he doesn't exist
+        _map_file.close()  # closing it after the existance check is done
+        self.log_success(f'\033[0;37m"{self.workspace_path}/map.json"\033[0m loaded successfully')
         while self.running:  # mainloop
             for event in pygame.event.get():  # basic pygame event handling
                 if event.type == pygame.QUIT:
