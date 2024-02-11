@@ -5,6 +5,8 @@
 # IMPORTS
 import pygame
 import time
+import tkinter
+from tkinter import filedialog
 
 
 # CLASSES
@@ -41,6 +43,17 @@ class Editor:  # main class for the editor
         if variable == equal_to: self.log(f'\033[1;33mWARNING: {msg}\033[0m')  # loging with a yellow message
         return variable == equal_to
 
+    def fatal_error(self, msg, exit_code=1):  # log an error message and exit with the specified exit code
+        self.log(f'\033[1;31mERROR: {msg}\033[0m')  # log the error message
+        pygame.quit()  # exiting pygame cleanly
+        exit(exit_code)  # exiting the program with the specified exit code
+
+    @staticmethod  # not using self -> static method
+    def ask_for_path(title):  # method to open an explorer window to select a directory (freeze  but pygame don't crash)
+        root = tkinter.Tk()  # creatoing a tkinter window to have a reference to it and avoid aving one created by default
+        root.wm_iconify()  # hiding the window so that only the explorer gui is shown
+        return filedialog.askdirectory(title=title)  # using tkinter.filedialog to ask for directory
+
     def render(self):  # method responsable for the rendering (visual part.)
         self.root.fill('black')  # resetting the root with black
         # TODO: implement visual part
@@ -50,10 +63,16 @@ class Editor:  # main class for the editor
         pass
 
     def run(self):  # method containing the mainloop
+        self.workspace_path = self.ask_for_path('Select workspace directory')  # ask for the workspace path
+        self.log(f'Selected workspace path: "{self.workspace_path}"')
+        if self.workspace_path == '':  # checking if the anwser is correct
+            self.fatal_error('Workspace path is empty, exiting with code -2', -2)
+        else:
+            self.log_success('Workspace path is valid, loading data from directory')
         while self.running:  # mainloop
             for event in pygame.event.get():  # basic pygame event handling
-                if event.type == pygame.QUIT:  #
-                    self.running = False  #
+                if event.type == pygame.QUIT:
+                    self.running = False
 
             self.update()  # calling Editor.update method each frame
             self.render()  # calling Editor.render method each frame
