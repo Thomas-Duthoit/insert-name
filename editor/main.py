@@ -57,8 +57,13 @@ class Editor:  # main class for the editor
         exit(exit_code)  # exiting the program with the specified exit code
 
     @staticmethod  # not using self -> static method
+    def input(msg):  # gets user input and returns it
+        return input(f'\033[1;35mINPUT:\033[0m {msg}')
+
+    @staticmethod  # not using self -> static method
     def ask_for_path(title):  # method to open an explorer window to select a directory (freeze  but pygame don't crash)
-        root = tkinter.Tk()  # creating a tkinter window to have a reference to it and avoid having one created by default
+        root = tkinter.Tk()  # creating a tkinter window to have a reference to it and avoid having one created by
+        #                      default
         root.wm_iconify()  # hiding the window so that only the explorer gui is shown
         return filedialog.askdirectory(title=title)  # using tkinter.filedialog to ask for directory
 
@@ -79,7 +84,8 @@ class Editor:  # main class for the editor
             self.log_success('Workspace path is valid, loading data from directory')
         self.log('Loading project')
         # creating the json files if they don't exist
-        _map_file = open(f'{self.workspace_path}/map.json', 'a')  # the 'a' open argument creates the file if he doesn't exist
+        _map_file = open(f'{self.workspace_path}/map.json', 'a')  # the 'a' open argument creates the file if he
+        #                                                           doesn't exist
         _map_file.close()  # closing it after the existence check is done
         self.log_success(f'\033[0;37m"{self.workspace_path}/map.json"\033[0m loaded successfully')
 
@@ -87,11 +93,11 @@ class Editor:  # main class for the editor
         flag = False  # flag used to know if any setup was done inside the project
         with open(f'{self.workspace_path}/map.json', 'w+') as _map_file:  # opening map.json
             if not _map_file.readlines():  # if the file is empty
+                self.log_warning('map.json is empty, creating basic structure')
                 _BASIC_STRUCTURE = {
-                    'name': 'NEW MAP',
+                    'name': self.input("Map name :"),
                     'areas': []
                 }
-                self.log_warning('map.json is empty, creating basic structure')
                 # writing the default data into map.json
                 _map_file.seek(0)
                 json.dump(_BASIC_STRUCTURE, _map_file, indent=4)
