@@ -4,6 +4,7 @@
 
 # IMPORTS
 import json
+import os.path
 
 import pygame
 import time
@@ -65,7 +66,9 @@ class Editor:  # main class for the editor
         root = tkinter.Tk()  # creating a tkinter window to have a reference to it and avoid having one created by
         #                      default
         root.wm_iconify()  # hiding the window so that only the explorer gui is shown
-        return filedialog.askdirectory(title=title)  # using tkinter.filedialog to ask for directory
+        path = filedialog.askdirectory(title=title)  # using tkinter.filedialog to ask for directory
+        root.destroy()
+        return path
 
     def render(self):  # method responsible for the rendering (visual part.)
         self.root.fill('black')  # resetting the root with black
@@ -91,7 +94,7 @@ class Editor:  # main class for the editor
 
         self.log('Project setup')
         flag = False  # flag used to know if any setup was done inside the project
-        with open(f'{self.workspace_path}/map.json', 'w+') as _map_file:  # opening map.json
+        with open(f'{self.workspace_path}/map.json', 'r+') as _map_file:  # opening map.json
             if not _map_file.readlines():  # if the file is empty
                 self.log_warning('map.json is empty, creating basic structure')
                 _BASIC_STRUCTURE = {
