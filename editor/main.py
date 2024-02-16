@@ -70,7 +70,7 @@ class Editor:  # main class for the editor
         root.destroy()
         return path
 
-    def check_and_create_file(self, relative_path):
+    def check_and_create_file(self, relative_path):  # create file if he doesn't exist
         # creating the json files if they don't exist
         if not os.path.exists(f'{self.workspace_path}/{relative_path}'):
             _map_file = open(f'{self.workspace_path}/{relative_path}', 'a')  # the 'a' open argument creates the file if he
