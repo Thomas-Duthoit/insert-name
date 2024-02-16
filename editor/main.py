@@ -70,6 +70,16 @@ class Editor:  # main class for the editor
         root.destroy()
         return path
 
+    def check_and_create_file(self, relative_path):
+        # creating the json files if they don't exist
+        if not os.path.exists(f'{self.workspace_path}/{relative_path}'):
+            _map_file = open(f'{self.workspace_path}/{relative_path}', 'a')  # the 'a' open argument creates the file if he
+            #                                                                doesn't exist
+            _map_file.close()  # closing it after the existence check is done
+            self.log_success(f'\033[0;37m"{self.workspace_path}/{relative_path}"\033[0m created successfully')
+        else:
+            self.log(f'\033[0;37m"{self.workspace_path}/{relative_path}"\033[0m already exists')
+
     def render(self):  # method responsible for the rendering (visual part.)
         self.root.fill('black')  # resetting the root with black
         # TODO: implement visual part
@@ -85,13 +95,11 @@ class Editor:  # main class for the editor
             self.fatal_error('Workspace path is empty, exiting with code -2', -2)
         else:
             self.log_success('Workspace path is valid, loading data from directory')
-        self.log('Loading project')
-        # creating the json files if they don't exist
-        _map_file = open(f'{self.workspace_path}/map.json', 'a')  # the 'a' open argument creates the file if he
-        #                                                           doesn't exist
-        _map_file.close()  # closing it after the existence check is done
-        self.log_success(f'\033[0;37m"{self.workspace_path}/map.json"\033[0m loaded successfully')
+        self.log('Project coherence check')
 
+        self.check_and_create_file('map.json')
+
+        self.log_success('Coherence check done')
         self.log('Project setup')
         flag = False  # flag used to know if any setup was done inside the project
         with open(f'{self.workspace_path}/map.json', 'r+') as _map_file:  # opening map.json
