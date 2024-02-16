@@ -96,8 +96,14 @@ class Editor:  # main class for the editor
         else:
             self.log_success('Workspace path is valid, loading data from directory')
         self.log('Project coherence check')
-
         self.check_and_create_file('map.json')
+        with open(f'{self.workspace_path}/map.json', 'r+') as _map_file:  # opening map.json
+            if _map_file.readlines():  # if the file is not empty
+                _map_file.seek(0)  # setting read index to the beggining of the file
+                _data = json.load(_map_file)  # loading file content into data variable
+                for file_name in _data['areas']:  # parsing each area name inside the json map _data
+                    self.check_and_create_file(f'{file_name}.json')  # checking if area files exists
+
 
         self.log_success('Coherence check done')
         self.log('Project setup')
@@ -114,6 +120,14 @@ class Editor:  # main class for the editor
                 json.dump(_BASIC_STRUCTURE, _map_file, indent=4)
                 _map_file.truncate()
                 flag = True
+            else:
+                _map_file.seek(0)  # going to begining of the map file
+                _data = json.load(_map_file)  # load the map file as _data
+                for area_name in _data['areas']:  # parsing each area name in _data
+                    with open(f'{self.workspace_path}/{area_name}.json', 'r+') as _area_file:  # opening map.json
+                        if not _area_file.readlines():  # area file is empty
+                            _area_file.write('{}')  # writing empty json structure into area map
+                            flag = True
         if flag:
             self.log_success('Project setup done')
         else:
