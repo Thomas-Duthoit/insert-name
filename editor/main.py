@@ -104,7 +104,6 @@ class Editor:  # main class for the editor
                 for file_name in _data['areas']:  # parsing each area name inside the json map _data
                     self.check_and_create_file(f'{file_name}.json')  # checking if area files exists
 
-
         self.log_success('Coherence check done')
         self.log('Project setup')
         flag = False  # flag used to know if any setup was done inside the project
@@ -112,21 +111,33 @@ class Editor:  # main class for the editor
             if not _map_file.readlines():  # if the file is empty
                 self.log_warning('map.json is empty, creating basic structure')
                 _BASIC_STRUCTURE = {
-                    'name': self.input("Map name :"),
+                    'name': self.input('Map name :'),
                     'areas': []
                 }
+                self.log('Initializing areas creation (press enter without a name if you are done')
+                _input_data = 'not empty'
+                while _input_data != '':
+                    _input_data = self.input("Provide area name: ")
+                    if _input_data is not '': _BASIC_STRUCTURE['areas'].append(_input_data)
                 # writing the default data into map.json
                 _map_file.seek(0)
                 json.dump(_BASIC_STRUCTURE, _map_file, indent=4)
                 _map_file.truncate()
                 flag = True
             else:
-                _map_file.seek(0)  # going to begining of the map file
+                _map_file.seek(0)  # going to beginning of the map file
                 _data = json.load(_map_file)  # load the map file as _data
                 for area_name in _data['areas']:  # parsing each area name in _data
                     with open(f'{self.workspace_path}/{area_name}.json', 'r+') as _area_file:  # opening map.json
                         if not _area_file.readlines():  # area file is empty
-                            _area_file.write('{}')  # writing empty json structure into area map
+                            self.log(f'Updating {area_name}.json')
+                            _AREA_STRUCTURE = {
+                                'w': self.input("Area width (in chunk, resizable later): "),
+                                'h': self.input("Area height (in chunk, resizable later): "),
+                            }
+                            _area_file.seek(0)
+                            json.dump(_AREA_STRUCTURE, _area_file, indent=4)
+                            _area_file.truncate()
                             flag = True
         if flag:
             self.log_success('Project setup done')

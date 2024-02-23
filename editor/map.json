@@ -1,6 +1,9 @@
 {
-    "name": "test map :)",
+    "name": "test",
     "areas": [
-        "zone1", "bidule", "truc"
+        "thomas",
+        "ewen",
+        "noa",
+        "juliette"
     ]
 }
