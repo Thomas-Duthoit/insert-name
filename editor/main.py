@@ -26,15 +26,18 @@ class Editor:  # main class for the editor
         self.root = pygame.display.set_mode(self.WS)  # creating the pygame window
         pygame.display.set_caption(self.WN)  # setting the window name to 'self.WN'
 
+
         self.workspace_path = ''  # variable used to know where to r/w data (path to workspace directory)
-
-        self.FILE_MANAGER = file_manager.FileManager()
-
         self.map_data = {
             'name': 'UNDEFINED',
             'areas': []
         }
 
+
+        self.zoom_factor = 2
+
+
+        self.FILE_MANAGER = file_manager.FileManager()
         self.running = True  # variable responsible for "mainloop while condition"
         self.log_success('Setup complete, starting the editor')
         self.run()  # starting the editor
@@ -77,7 +80,11 @@ class Editor:  # main class for the editor
 
     def render(self):  # method responsible for the rendering (visual part.)
         self.root.fill('black')  # resetting the root with black
-        # TODO: implement visual part
+        for area in self.map_data['areas']:
+            pygame.draw.rect(self.root, 'green',
+                             (area['x']*self.zoom_factor, area['y']*self.zoom_factor,
+                              area['w']*self.zoom_factor, area['h']*self.zoom_factor),
+                             1)
 
     def update(self):  # method responsible for the update (logical part.)
         # TODO: implement logical part
