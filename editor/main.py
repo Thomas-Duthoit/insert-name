@@ -4,12 +4,13 @@
 
 # IMPORTS
 import json
-import os.path
-
 import pygame
 import time
 import tkinter
 from tkinter import filedialog
+
+# IMPORTS (EXTERN SCRIPTS)
+import file_manager
 
 
 # CLASSES
@@ -26,9 +27,13 @@ class Editor:  # main class for the editor
         pygame.display.set_caption(self.WN)  # setting the window name to 'self.WN'
 
         self.workspace_path = ''  # variable used to know where to r/w data (path to workspace directory)
-        self.warning_check_equal(self.workspace_path,
-                                 '',
-                                 "The value of 'self.workspace_path' is not initialized in __init__")
+
+        self.FILE_MANAGER = file_manager.FileManager()
+
+        self.map_data = {
+            'name': 'UNDEFINED',
+            'areas': []
+        }
 
         self.running = True  # variable responsible for "mainloop while condition"
         self.log_success('Setup complete, starting the editor')
@@ -70,78 +75,6 @@ class Editor:  # main class for the editor
         root.destroy()
         return path
 
-    def check_and_create_file(self, relative_path):  # create file if he doesn't exist
-        # creating the json files if they don't exist
-        if not os.path.exists(f'{self.workspace_path}/{relative_path}'):
-            _map_file = open(f'{self.workspace_path}/{relative_path}', 'a')  # the 'a' open argument creates the file if he
-            #                                                                doesn't exist
-            _map_file.close()  # closing it after the existence check is done
-            self.log_success(f'\033[0;37m"{self.workspace_path}/{relative_path}"\033[0m created successfully')
-        else:
-            self.log(f'\033[0;37m"{self.workspace_path}/{relative_path}"\033[0m already exists')
-
-    def project_coherence_check(self):
-        self.check_and_create_file('map.json')
-        with open(f'{self.workspace_path}/map.json', 'r+') as _map_file:  # opening map.json
-            if _map_file.readlines():  # if the file is not empty
-                _map_file.seek(0)  # setting read index to the beggining of the file
-                _data = json.load(_map_file)  # loading file content into data variable
-                for file_name in _data['areas']:  # parsing each area name inside the json map _data
-                    self.check_and_create_file(f'{file_name}.json')  # checking if area files exists
-
-
-    def project_setup(self):
-        self.log('Project coherence check')
-        self.project_coherence_check()
-        self.log_success('Coherence check done')
-
-        self.log('Project setup')
-        flag = False  # flag used to know if any setup was done inside the project
-        with open(f'{self.workspace_path}/map.json', 'r+') as _map_file:  # opening map.json
-            if not _map_file.readlines():  # if the file is empty
-                self.log_warning('map.json is empty, creating basic structure')
-                _BASIC_STRUCTURE = {
-                    'name': self.input('Map name : '),
-                    'areas': []
-                }
-                self.log('Initializing areas creation (press enter without a name if you are done)')
-                _input_data = 'not empty'
-                while _input_data != '':
-                    _input_data = self.input('Provide area name : ')
-                    if _input_data != '': _BASIC_STRUCTURE['areas'].append(_input_data)
-                # writing the default data into map.json
-                _map_file.seek(0)
-                json.dump(_BASIC_STRUCTURE, _map_file, indent=4)
-                _map_file.truncate()
-                flag = True
-
-        if flag:
-            self.log_success('Changes have been made to map.json')
-            self.log('Redoing a coherence check')
-            self.project_coherence_check()
-            self.log_success('Coherence check done')
-
-        flag = False
-        with open(f'{self.workspace_path}/map.json', 'r+') as _map_file:  # opening map.json
-            _map_file.seek(0)  # going to beginning of the map file
-            _data = json.load(_map_file)  # load the map file as _data
-            for area_name in _data['areas']:  # parsing each area name in _data
-                with open(f'{self.workspace_path}/{area_name}.json', 'r+') as _area_file:  # opening map.json
-                    if not _area_file.readlines():  # area file is empty
-                        self.log(f'Updating {area_name}.json')
-                        _AREA_STRUCTURE = {
-                            'w': self.input('Area width (in chunk, resizable later): '),
-                            'h': self.input('Area height (in chunk, resizable later): '),
-                        }
-                        _area_file.seek(0)
-                        json.dump(_AREA_STRUCTURE, _area_file, indent=4)
-                        _area_file.truncate()
-                        flag = True
-        if flag:
-            self.log_success('Changes have been made to areas')
-
-        self.log('Project setup done')
-
     def render(self):  # method responsible for the rendering (visual part.)
         self.root.fill('black')  # resetting the root with black
         # TODO: implement visual part
@@ -158,7 +91,8 @@ class Editor:  # main class for the editor
         else:
             self.log_success('Workspace path is valid, loading data from directory')
 
-        self.project_setup()
+        self.FILE_MANAGER.project_setup(self)
+        self.FILE_MANAGER.load_project(self)
 
         while self.running:  # mainloop
             for event in pygame.event.get():  # basic pygame event handling
