@@ -1,7 +1,13 @@
+# MAP EDITOR
+# Authors: Ewen B.
+#          Thomas D.
+
+# IMPORTS
 import os
 import json
 
 
+# CLASSES
 class FileManager:
     def __init__(self):
         pass
