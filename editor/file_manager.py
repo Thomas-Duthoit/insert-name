@@ -1,4 +1,4 @@
-# MAP EDITOR
+# FILE MANAGER
 # Authors: Ewen B.
 #          Thomas D.
 

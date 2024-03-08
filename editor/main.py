@@ -3,7 +3,6 @@
 #          Thomas D.
 
 # IMPORTS
-import json
 import pygame
 import time
 import tkinter
@@ -11,11 +10,15 @@ from tkinter import filedialog
 
 # IMPORTS (EXTERN SCRIPTS)
 import file_manager
+import text
 
 
 # CLASSES
 class Editor:  # main class for the editor
     def __init__(self):  # class init
+
+        pygame.init()  # pygame global init
+
         self.TIME_FLAG = time.time()  # CONST: timestamp used by the log function
         # 'self.TIME_FLAG' must be initialized before the first log because his value is used by the 'log' method
         self.log('Starting setup')
@@ -33,11 +36,11 @@ class Editor:  # main class for the editor
             'areas': []
         }
 
-
         self.zoom_factor = 2
 
-
         self.FILE_MANAGER = file_manager.FileManager()
+        self.TM_AREA = text.TextManager('Consolas.ttf', size=0)
+
         self.running = True  # variable responsible for "mainloop while condition"
         self.log_success('Setup complete, starting the editor')
         self.run()  # starting the editor
@@ -80,11 +83,16 @@ class Editor:  # main class for the editor
 
     def render(self):  # method responsible for the rendering (visual part.)
         self.root.fill('black')  # resetting the root with black
+        # -/*/- MINIMAP RENDER -/*/- #
         for area in self.map_data['areas']:
             pygame.draw.rect(self.root, 'green',
                              (area['x']*self.zoom_factor, area['y']*self.zoom_factor,
                               area['w']*self.zoom_factor, area['h']*self.zoom_factor),
                              1)
+        # -/*/- AREAs NAME RENDER -/*/- #
+        for i, area in enumerate(self.map_data['areas']):
+            self.TM_AREA.display(area['name'], (self.WS[0] - 200, i), self.root)
+
 
     def update(self):  # method responsible for the update (logical part.)
         # TODO: implement logical part
